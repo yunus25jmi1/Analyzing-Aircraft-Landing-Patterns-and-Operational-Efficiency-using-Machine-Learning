@@ -1,0 +1,9 @@
+# Ignore Copilot config
+.github/copilot-instructions.md
+
+# Ignore virtual environment
+.venv/
+
+# Ignore system and cache files
+__pycache__/
+*.pyc
