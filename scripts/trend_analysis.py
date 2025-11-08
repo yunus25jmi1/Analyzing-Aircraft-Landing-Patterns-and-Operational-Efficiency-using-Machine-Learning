@@ -11,6 +11,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error
+import joblib
 
 # Load cleaned data
 df = pd.read_csv('data/cleaned_data.csv')
@@ -28,6 +29,9 @@ y = daily_landings['landings']
 model = LinearRegression()
 model.fit(X, y)
 predictions = model.predict(X)
+
+# Save the model
+joblib.dump(model, 'models/trend_model.pkl')
 
 # Plot trend
 plt.figure(figsize=(10, 6))
@@ -52,9 +56,9 @@ print(f"Mean Squared Error: {mse}")
 # Using statsmodels for decomposition
 from statsmodels.tsa.seasonal import seasonal_decompose
 
-if len(daily_landings) > 365:  # Assuming daily data
+if len(daily_landings) > 12:  # Assuming monthly data
     daily_landings.set_index('date', inplace=True)
-    decomposition = seasonal_decompose(daily_landings['landings'], model='additive', period=365)
+    decomposition = seasonal_decompose(daily_landings['landings'], model='additive', period=12)
     decomposition.plot()
     plt.savefig('docs/seasonal_decomposition.png')
     plt.show()

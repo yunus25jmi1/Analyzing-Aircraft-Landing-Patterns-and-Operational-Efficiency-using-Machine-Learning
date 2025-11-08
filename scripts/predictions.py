@@ -10,6 +10,8 @@ import pandas as pd
 from prophet import Prophet
 import matplotlib.pyplot as plt
 from sklearn.ensemble import IsolationForest
+import pickle
+import joblib
 
 # Load cleaned data
 df = pd.read_csv('data/cleaned_data.csv')
@@ -23,8 +25,12 @@ prophet_df = daily_landings.rename(columns={'date': 'ds', 'landings': 'y'})
 model = Prophet()
 model.fit(prophet_df)
 
-# Make future dataframe for next 30 days
-future = model.make_future_dataframe(periods=30)
+# Save the Prophet model
+with open('models/prophet_model.pkl', 'wb') as f:
+    pickle.dump(model, f)
+
+# Make future dataframe for next 12 months
+future = model.make_future_dataframe(periods=12, freq='M')
 forecast = model.predict(future)
 
 # Plot forecast
@@ -36,6 +42,9 @@ plt.show()
 # Anomaly detection using Isolation Forest
 iso_forest = IsolationForest(contamination=0.1)  # Assume 10% anomalies
 daily_landings['anomaly'] = iso_forest.fit_predict(daily_landings[['landings']])
+
+# Save the IsolationForest model
+joblib.dump(iso_forest, 'models/anomaly_model.pkl')
 
 # Plot anomalies
 plt.figure(figsize=(10, 6))

@@ -11,7 +11,7 @@ import numpy as np
 
 # Load the dataset
 # Replace 'air_traffic_landings.csv' with the actual filename if different
-df = pd.read_csv('data/air_traffic_landings.csv')
+df = pd.read_csv('data/air-traffic-landings-statistics.csv')
 
 # Inspect the first few rows to understand the structure
 print("First 5 rows of the dataset:")
@@ -22,11 +22,14 @@ print("\nColumn names and data types:")
 print(df.dtypes)
 
 # Handle missing values - for example, drop rows with missing critical data
-# Assuming 'date' and 'landings' are critical; adjust based on actual columns
-df.dropna(subset=['date', 'landings'], inplace=True)  # Placeholder columns
+# Assuming 'Activity Period' and 'Landing Count' are critical; adjust based on actual columns
+df.dropna(subset=['Activity Period', 'Landing Count'], inplace=True)  # Placeholder columns
 
-# Convert date column to datetime
-df['date'] = pd.to_datetime(df['date'])  # Placeholder
+# Convert Activity Period to datetime (format YYYYMM)
+df['Activity Period'] = pd.to_datetime(df['Activity Period'], format='%Y%m')
+
+# Rename columns for ease
+df.rename(columns={'Activity Period': 'date', 'Landing Count': 'landings'}, inplace=True)
 
 # Remove duplicates if any
 df.drop_duplicates(inplace=True)

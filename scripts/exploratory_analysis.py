@@ -9,6 +9,7 @@ Outputs: Summary statistics printed, plots saved in docs/ folder
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+import numpy as np
 
 # Load cleaned data
 df = pd.read_csv('data/cleaned_data.csv')
@@ -42,10 +43,10 @@ plt.savefig('docs/landings_distribution.png')
 plt.show()
 
 # If there are categorical columns, e.g., aircraft_type
-if 'aircraft_type' in df.columns:
+if 'Aircraft Body Type' in df.columns:
     plt.figure(figsize=(10, 6))
-    sns.countplot(data=df, x='aircraft_type')
-    plt.title('Count of Aircraft Types')
+    sns.countplot(data=df, x='Aircraft Body Type')
+    plt.title('Count of Aircraft Body Types')
     plt.xticks(rotation=45)
     plt.savefig('docs/aircraft_types.png')
     plt.show()
