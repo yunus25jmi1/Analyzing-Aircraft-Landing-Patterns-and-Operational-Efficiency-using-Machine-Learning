@@ -10,17 +10,22 @@ from dash import Dash, dcc, html, Input, Output, State
 def load_data():
     data_path = os.path.join('data', 'cleaned_data.csv')
     df = pd.read_csv(data_path)
-    # ensure date conversion; tolerate multiple formats
-    try:
-        df['Activity Period'] = pd.to_datetime(df['Activity Period'], format='%Y%m')
-    except Exception:
-        df['Activity Period'] = pd.to_datetime(df['Activity Period'])
+    # convert source date column to datetime and create a monthly activity period
+    if 'date' in df.columns:
+        df['date'] = pd.to_datetime(df['date'])
+        df['Activity Period'] = df['date']
+    else:
+        # fallback if another column exists
+        try:
+            df['Activity Period'] = pd.to_datetime(df['Activity Period'])
+        except Exception:
+            df['Activity Period'] = pd.to_datetime(df.iloc[:, 0])
     return df
 
 
 df = load_data()
 
-monthly_landings = df.groupby('Activity Period')['Landing Count'].sum().reset_index()
+monthly_landings = df.groupby('Activity Period')['landings'].sum().reset_index()
 
 app = Dash(__name__)
 
@@ -42,9 +47,9 @@ app.layout = html.Div([
                 figure=px.line(monthly_landings, x='Activity Period', y='Landing Count', title='Monthly Aircraft Landings')
             ),
             html.H3('Landing Count Distribution'),
-            dcc.Graph(id='dist', figure=px.histogram(df, x='Landing Count', nbins=30, title='Distribution of Landing Counts')),
+            dcc.Graph(id='dist', figure=px.histogram(df, x='landings', nbins=30, title='Distribution of Landing Counts')),
             html.H3('Top Aircraft Types'),
-            dcc.Graph(id='types', figure=px.bar(df['Aircraft Type'].value_counts().reset_index().rename(columns={'index':'Aircraft Type', 'Aircraft Type':'Count'}).head(10), x='Aircraft Type', y='Count', title='Top 10 Aircraft Types'))
+            dcc.Graph(id='types', figure=px.bar(df['Landing Aircraft Type'].value_counts().reset_index().rename(columns={'index':'Landing Aircraft Type', 'Landing Aircraft Type':'Count'}).head(10), x='Landing Aircraft Type', y='Count', title='Top 10 Aircraft Types'))
         ]),
 
         dcc.Tab(label='Predictions', children=[
@@ -70,7 +75,8 @@ def fetch_forecast(n_clicks, periods):
     if not n_clicks:
         return ''
     try:
-        resp = requests.get(f'http://localhost:8000/forecast?periods={int(periods)}', timeout=10)
+        # API expects POST with JSON body {"months": <int>}
+        resp = requests.post('http://localhost:8000/forecast', json={"months": int(periods)}, timeout=10)
         if resp.status_code == 200:
             data = resp.json()
             return json.dumps(data, indent=2)
@@ -84,7 +90,10 @@ def fetch_anomalies(n_clicks):
     if not n_clicks:
         return ''
     try:
-        resp = requests.get('http://localhost:8000/anomaly', timeout=10)
+        # Anomaly endpoint expects a POST with JSON {"value": float}
+        # We'll send the last monthly landing mean as a sample value
+        sample_value = float(df['Landing Count'].mean())
+        resp = requests.post('http://localhost:8000/anomaly', json={"value": sample_value}, timeout=10)
         if resp.status_code == 200:
             return json.dumps(resp.json(), indent=2)
         return f'API error: {resp.status_code} - {resp.text}'
