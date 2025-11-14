@@ -49,7 +49,7 @@ app.layout = html.Div([
             html.H3('Monthly Aircraft Landings'),
             dcc.Graph(
                 id='landings-time',
-                figure=px.line(monthly_landings, x='Activity Period', y='Landing Count', title='Monthly Aircraft Landings')
+                figure=px.line(monthly_landings, x='Activity Period', y='landings', title='Monthly Aircraft Landings')
             ),
             html.H3('Landing Count Distribution'),
             dcc.Graph(id='dist', figure=px.histogram(df, x='landings', nbins=30, title='Distribution of Landing Counts')),
@@ -97,7 +97,7 @@ def fetch_anomalies(n_clicks):
     try:
         # Anomaly endpoint expects a POST with JSON {"value": float}
         # We'll send the last monthly landing mean as a sample value
-        sample_value = float(df['Landing Count'].mean())
+        sample_value = float(df['landings'].mean())
         resp = requests.post('http://localhost:8000/anomaly', json={"value": sample_value}, timeout=10)
         if resp.status_code == 200:
             return json.dumps(resp.json(), indent=2)
