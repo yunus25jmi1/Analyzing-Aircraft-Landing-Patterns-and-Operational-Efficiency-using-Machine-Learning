@@ -7,6 +7,12 @@ anomaly detection, and trend analysis.
 
 import warnings
 warnings.filterwarnings("ignore", message="Importing plotly failed")
+import logging
+
+# Basic logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s')
+logger = logging.getLogger(__name__)
+logger.info("Starting Aircraft Landing Analysis API")
 
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel

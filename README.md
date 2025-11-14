@@ -26,6 +26,58 @@ This is a 4-week academic aerospace project analyzing air traffic landing data f
 - `POST /anomaly`: Check if a value is an anomaly
 - `GET /trend`: Get trend slope
 
+## Dashboard
+
+- A Dash-based dashboard is available at `dashboard.py`. It reads `data/cleaned_data.csv` and provides:
+	- Data overview and sample table
+	- Visualizations (monthly landings, distribution, aircraft types)
+	- Buttons to call the API endpoints for forecast, anomaly detection, and trend analysis
+
+Run the dashboard locally (make sure the API is running):
+```powershell
+# Activate venv (PowerShell)
+C:\Users\Yunus\Downloads\Internship\.venv\Scripts\Activate.ps1
+
+# Start API in one terminal
+python -m uvicorn app:app --reload
+
+# Start dashboard in another terminal
+python dashboard.py
+
+# Open http://127.0.0.1:8050 in your browser
+```
+
+## Docker / Deployment
+
+- A `Dockerfile` and `docker-compose.yml` are included to run the API and dashboard as containers.
+
+To run locally with Docker Compose:
+```powershell
+# Build and start services
+docker-compose up --build
+
+# API -> http://localhost:8000
+# Dashboard -> http://localhost:8050
+```
+
+## Continuous Integration
+
+- A GitHub Actions workflow is configured at `.github/workflows/ci.yml` to run tests on push/pull requests to `main`.
+
+## Run full pipeline
+
+- A helper script `run_pipeline.py` is provided to run the data pipeline scripts in order. Use:
+```powershell
+python run_pipeline.py
+```
+
+## Tests
+
+- Run unit & integration tests with:
+```powershell
+python -m pytest -q
+```
+
 ## Running Tests
 Run unit tests: `pytest tests/`
 
