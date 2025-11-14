@@ -4,7 +4,7 @@ import requests
 import pandas as pd
 from datetime import datetime
 import plotly.express as px
-from dash import Dash, dcc, html, Input, Output, State
+from dash import Dash, dcc, html, Input, Output, State, dash_table
 
 
 def load_data():
@@ -37,7 +37,12 @@ app.layout = html.Div([
             html.Div(f'Total records: {len(df)}'),
             html.Div(f"Date range: {monthly_landings['Activity Period'].min().strftime('%Y-%m')} to {monthly_landings['Activity Period'].max().strftime('%Y-%m')}") ,
             html.H4('Sample Data'),
-            dcc.Graph(figure=px.table(df.head(10)))
+            dash_table.DataTable(
+                data=df.head(10).to_dict('records'),
+                columns=[{"name": c, "id": c} for c in df.head(10).columns],
+                page_size=10,
+                style_table={'overflowX': 'auto'}
+            )
         ]),
 
         dcc.Tab(label='Visualizations', children=[
