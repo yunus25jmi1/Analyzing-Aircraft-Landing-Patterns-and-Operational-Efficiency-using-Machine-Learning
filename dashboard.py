@@ -26,6 +26,13 @@ def load_data():
 df = load_data()
 
 monthly_landings = df.groupby('Activity Period')['landings'].sum().reset_index()
+# Prepare aircraft type counts for plotting
+if 'Landing Aircraft Type' in df.columns:
+    df_types = df['Landing Aircraft Type'].value_counts().reset_index()
+    df_types.columns = ['Landing Aircraft Type', 'Count']
+    df_types = df_types.head(10)
+else:
+    df_types = pd.DataFrame(columns=['Landing Aircraft Type', 'Count'])
 
 app = Dash(__name__)
 
@@ -54,7 +61,7 @@ app.layout = html.Div([
             html.H3('Landing Count Distribution'),
             dcc.Graph(id='dist', figure=px.histogram(df, x='landings', nbins=30, title='Distribution of Landing Counts')),
             html.H3('Top Aircraft Types'),
-            dcc.Graph(id='types', figure=px.bar(df['Landing Aircraft Type'].value_counts().reset_index().rename(columns={'index':'Landing Aircraft Type', 'Landing Aircraft Type':'Count'}).head(10), x='Landing Aircraft Type', y='Count', title='Top 10 Aircraft Types'))
+            dcc.Graph(id='types', figure=px.bar(df_types, x='Landing Aircraft Type', y='Count', title='Top 10 Aircraft Types'))
         ]),
 
         dcc.Tab(label='Predictions', children=[
