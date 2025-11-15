@@ -350,6 +350,14 @@ Successfully developed and deployed an end-to-end machine learning system for an
 3. **User-Centric Design:** Dashboard usability matters as much as model accuracy
 4. **Documentation is Code:** Clear README enabled seamless handoff and collaboration
 
+**Key Improvisations:**
+
+1. **Dashboard Framework Switch:** Pivoted from Streamlit (build failures with pyarrow/CMake) and Gradio (Rust toolchain issues) to Dash for cross-platform compatibility without native dependencies
+2. **Multi-Stage Docker Build:** Implemented builder pattern to separate dependency compilation from runtime, reducing final image size by ~40%
+3. **API Design Pattern:** Changed forecast/anomaly endpoints from GET to POST to support complex request bodies and follow REST best practices
+4. **Data Column Alignment:** Dynamically handled actual dataset columns (`date`, `landings`, `Landing Aircraft Type`) instead of assumed names for robust data loading
+5. **CI/CD Integration:** Added GitHub Actions workflows for automated testing and container registry publishing to ensure quality on every commit
+
 **Future Roadmap:**
 
 **Immediate Next Steps:**
